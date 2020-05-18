@@ -1,0 +1,12 @@
+target/
+sbt-dist
+.settings
+.project
+.classpath
+
+.idea
+*.iml
+
+.metals
+.bloop
+
