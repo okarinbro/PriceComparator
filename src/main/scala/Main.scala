@@ -1,55 +1,18 @@
-//#full-example
-import Client.ComparisonResult
-import Comparator.AskForComparison
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.{ActorSystem, Props}
+import scala.io.StdIn.{readLine}
 
-object Worker {
+object Main {
+  def main(args: Array[String]): Unit = {
+    implicit val system: ActorSystem = ActorSystem("local_system")
 
-  final case class Compare(productName: String, replyTo: ActorRef[ComparisonResult])
+    val server = system.actorOf(Props[Server], "server")
+    val client1 = system.actorOf(Client.apply(server), "client1")
+    val client2 = system.actorOf(Client.apply(server), "client2")
 
-  def apply(): Behavior[Compare] = Behaviors.receive { (context, message) =>
-    context.log.info("Doing job...")
-    Thread.sleep(1000)
-    message.replyTo ! ComparisonResult(message.productName, 29.99)
-    Behaviors.same
+    while (true) {
+      println("Type product name")
+      val productName = readLine()
+      client1 ! productName
+    }
   }
 }
-
-
-object Comparator {
-
-  final case class AskForComparison(productName: String, replyTo: ActorRef[ComparisonResult])
-
-  def apply(): Behavior[AskForComparison] =
-    Behaviors.setup { context =>
-      val greeter = context.spawn(Worker(), "worker")
-      Behaviors.receiveMessage { message =>
-        greeter ! Worker.Compare(message.productName, message.replyTo)
-        Behaviors.same
-      }
-    }
-}
-
-
-object Client {
-
-  final case class ComparisonResult(name: String, value: Double)
-
-  def apply(): Behavior[ComparisonResult] =
-    Behaviors.setup {
-      _ =>
-        Behaviors.receiveMessage { message =>
-          println("Cheaper is: ", message.name, message.value)
-          Behaviors.same
-        }
-    }
-
-}
-
-object AkkaQuickstart extends App {
-  val main: ActorSystem[Comparator.AskForComparison] = ActorSystem(Comparator(), "Main")
-  val client: ActorRef[ComparisonResult] = ActorSystem(Client(), "Client")
-  main ! AskForComparison("randomProduct", client)
-}
-
