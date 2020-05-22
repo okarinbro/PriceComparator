@@ -1,4 +1,4 @@
-name := "price comparator"
+name := "Comparaon"
 
 version := "1.0"
 

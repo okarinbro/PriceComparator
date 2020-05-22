@@ -6,3 +6,6 @@ case class QueryResult(productName: String, price: Double)
 
 case class QueryOrder(productName: String, sender: ActorRef)
 
+case class FindPrice(productName: String)
+
+case class PriceNotFound(productName: String)
