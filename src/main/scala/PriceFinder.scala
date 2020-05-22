@@ -1,9 +1,10 @@
 import akka.actor.{Actor, ActorLogging, PoisonPill}
-import akka.event.Logging
+import akka.event.{Logging, LoggingAdapter}
+
 import scala.util.Random
 
 class PriceFinder extends Actor {
-  val log = Logging(context.system, this)
+  val log: LoggingAdapter = Logging(context.system, this)
 
   override def receive: Receive = {
     case message: FindPrice =>
