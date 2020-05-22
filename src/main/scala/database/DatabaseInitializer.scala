@@ -1,14 +1,24 @@
 package database
 
 import java.io.File
-import java.nio.file.Paths
-import java.sql.DriverManager
+import java.nio.file.{Files, Paths}
+import java.sql.{Connection, DriverManager, SQLException}
 
 class DatabaseInitializer {
-  def createNewDatabase(): Unit = {
+  private val path: String = Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
+  val dbURL = "jdbc:sqlite:" + path
+
+  def initDbIfNotExists(): Unit = {
+    if (!Files.exists(Paths.get(path))) {
+      createDatabase()
+      createTable()
+    }
+  }
+
+  private def createDatabase(): Unit = {
+    var connection: Connection = null
     try {
-      val dbURL = "jdbc:sqlite:" + Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
-      val connection = DriverManager.getConnection(dbURL)
+      connection = DriverManager.getConnection(dbURL)
       if (connection != null) {
         val meta = connection.getMetaData
         println("The driver name is " + meta.getDriverName)
@@ -16,6 +26,26 @@ class DatabaseInitializer {
       }
     } catch {
       case exception: Exception => println("Couldn't create database due to: {}".format(exception.getMessage))
+    } finally {
+      if (connection != null) connection.close()
+    }
+  }
+
+  def createTable(): Unit = {
+    val sqlDdl: String = "CREATE TABLE IF NOT EXISTS Queries (\n" +
+      "	id text PRIMARY KEY,\n" +
+      "	occurrences int NOT NULL );"
+    try {
+      val connection = DriverManager.getConnection(dbURL)
+      val statement = connection.createStatement
+      try
+        statement.execute(sqlDdl)
+      catch {
+        case e: Exception => println(e.getMessage)
+      } finally {
+        if (connection != null) connection.close()
+        if (statement != null) statement.close()
+      }
     }
   }
 }
