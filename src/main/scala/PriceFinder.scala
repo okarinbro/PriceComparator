@@ -1,4 +1,4 @@
-import akka.actor.{Actor, ActorLogging, PoisonPill}
+import akka.actor.{Actor, PoisonPill}
 import akka.event.{Logging, LoggingAdapter}
 
 import scala.util.Random
@@ -11,7 +11,7 @@ class PriceFinder extends Actor {
       Thread.sleep(new Random().between(100, 500))
       val price = new Random().between(1.0, 10.0)
       log.debug("Price of {} : {}", message.productName, price.toString)
-      sender ! QueryResult(message.productName, price)
+      sender ! FoundPrice(message.productName, price)
       self ! PoisonPill
     case _ => println("price finder got message")
   }

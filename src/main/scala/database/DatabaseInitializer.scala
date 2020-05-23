@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 import java.sql.{Connection, DriverManager, SQLException}
 
 class DatabaseInitializer {
-  private val path: String = Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
+  val path: String = Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
   val dbURL = "jdbc:sqlite:" + path
 
   def initDbIfNotExists(): Unit = {
@@ -33,8 +33,9 @@ class DatabaseInitializer {
 
   def createTable(): Unit = {
     val sqlDdl: String = "CREATE TABLE IF NOT EXISTS Queries (\n" +
-      "	id text PRIMARY KEY,\n" +
-      "	occurrences int NOT NULL );"
+      "	id integer PRIMARY KEY,\n" +
+      "	productName text NOT NULL,\n" +
+      "	occurrences integer NOT NULL );"
     try {
       val connection = DriverManager.getConnection(dbURL)
       val statement = connection.createStatement

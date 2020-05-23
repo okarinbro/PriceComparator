@@ -3,7 +3,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 class Client(server: ActorRef) extends Actor {
   override def receive(): Receive = {
     case productName: String => this.server ! Query(productName); println("client")
-    case result: QueryResult => println(result.productName, " ", result.price)
+    case result: QueryResult => println(result.productName, " ", result.price, " ", result.occurrences)
   }
 }
 
