@@ -21,7 +21,7 @@ object Main {
       if (command.equals("q")) {
         System.exit(0)
       }
-      if (!"[1-10]:.+".r.matches(command)) {
+      if (!"^([1-9]|10):.+".r.matches(command)) {
         println("Invalid input")
       } else {
         val params = command.split(":")

@@ -27,14 +27,14 @@ class Worker extends Actor {
   def update(conn: Connection, productName: String, occurrences: Int) = {
     val sql = "UPDATE Queries SET occurrences = ? WHERE productName = ?";
     val pstmt = conn.prepareStatement(sql)
-    pstmt.setInt(1, occurrences + 1)
+    pstmt.setInt(1, occurrences)
     pstmt.setString(2, productName)
     pstmt.executeUpdate();
   }
 
   def getOccurrences(productName: String): Int = {
     val sql: String = "SELECT occurrences FROM Queries WHERE productName = '%s'".format(productName)
-    var occurrences = 0
+    var occurrences = 1
     Using(DriverManager.getConnection(dbURL)) {
       conn =>
         val stmt = conn.createStatement()
@@ -42,7 +42,7 @@ class Worker extends Actor {
         if (rs.isClosed) {
           insert(conn, productName)
         } else {
-          occurrences = rs.getInt(1)
+          occurrences = rs.getInt(1) + 1
           update(conn, productName, occurrences)
         }
     }
