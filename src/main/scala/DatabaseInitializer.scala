@@ -1,8 +1,6 @@
-package database
-
 import java.io.File
 import java.nio.file.{Files, Paths}
-import java.sql.{Connection, DriverManager, SQLException}
+import java.sql.{Connection, DriverManager}
 
 class DatabaseInitializer {
   val path: String = Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
