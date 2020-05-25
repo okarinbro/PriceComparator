@@ -15,14 +15,14 @@ class HttpServer(localServer: ActorRef) {
   private val htmlParser: OpineoHtmlResponseParser = new OpineoHtmlResponseParser
   private implicit val serverResponseWriter: RootJsonWriter[Response] = {
     case queryResult: QueryResult => jsonFormat3(QueryResult).write(queryResult)
-    case priceNotFound: PriceNotFound => jsonFormat2(PriceNotFound).write(priceNotFound)
+    case priceNotFound: PriceNotFound => jsonFormat1(PriceNotFound).write(priceNotFound)
   }
 
   def handleRequests(implicit executionContext: ExecutionContext, timeout: Timeout, system: ActorSystem): Route = {
     concat(pathPrefix("price" / Remaining) { id =>
       get {
         val eventualResponse = (localServer ? Query(id)).fallbackTo(Future {
-          PriceNotFound(id, 0)
+          PriceNotFound(id)
         }).mapTo[Response]
         complete(eventualResponse)
       }
