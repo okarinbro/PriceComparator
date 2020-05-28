@@ -15,6 +15,7 @@ class HttpServer(localServer: ActorRef) {
   private val htmlParser: OpineoHtmlResponseParser = new OpineoHtmlResponseParser
   private implicit val serverResponseWriter: RootJsonWriter[Response] = {
     case queryResult: QueryResult => jsonFormat3(QueryResult).write(queryResult)
+    case pureRes: PureQueryResult => jsonFormat2(PureQueryResult).write(pureRes)
     case priceNotFound: PriceNotFound => jsonFormat1(PriceNotFound).write(priceNotFound)
   }
 
