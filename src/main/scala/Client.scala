@@ -1,9 +1,10 @@
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, Props}
 
 class Client(server: ActorRef) extends Actor {
   override def receive(): Receive = {
-    case productName: String => this.server ! Query(productName); println("client")
-    case result: QueryResult => println(result.productName, " ", result.price, " ", result.occurrences)
+    case productName: String => this.server ! Query(productName)
+    case result: QueryResult => println("%s: %f $. Query occurred: %d times.".format(result.productName, result.price, result.occurrences))
+    case pureResult: PureQueryResult => println("%s: %f $.".format(pureResult.productName, pureResult.price))
     case notFound: PriceNotFound => println("Price for %s not found".format(notFound.productName))
   }
 }
