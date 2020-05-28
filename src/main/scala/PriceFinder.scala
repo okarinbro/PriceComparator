@@ -10,8 +10,8 @@ class PriceFinder extends Actor {
     case message: FindPrice =>
       Thread.sleep(new Random().between(100, 500))
       val price = new Random().between(1.0, 10.0)
-      log.debug("Price of {} : {}", message.productName, price.toString)
       sender ! FoundPrice(message.productName, price)
+      log.debug("Price of {} : {}. Message has been sent.", message.productName, price.toString)
       self ! PoisonPill
     case _ => println("price finder got message")
   }

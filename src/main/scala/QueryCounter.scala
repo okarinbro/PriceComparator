@@ -2,15 +2,18 @@ import java.io.File
 import java.nio.file.Paths
 import java.sql.{Connection, DriverManager}
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorLogging}
 
 import scala.concurrent.ExecutionContext
 import scala.util.Using
 
-class QueryCounter extends Actor {
+class QueryCounter extends Actor with ActorLogging with DatabaseManager {
   implicit val executionContext: ExecutionContext = context.dispatcher
-  val path: String = Paths.get(".").toAbsolutePath + File.separator + "Comparator.db"
-  val dbURL = "jdbc:sqlite:" + path
+
+  override def receive: Receive = {
+    case msg: CountQueryOccurrences =>
+      sender() ! QueryOccurrencesResult(getOccurrences(msg.productName))
+  }
 
   def insert(conn: Connection, productName: String) = {
     val sql = "INSERT INTO Queries(productName, occurrences) VALUES(?,?)"
@@ -43,10 +46,5 @@ class QueryCounter extends Actor {
         }
     }
     occurrences
-  }
-
-  override def receive: Receive = {
-    case msg: CountQueryOccurrences =>
-      sender() ! QueryOccurrencesResult(getOccurrences(msg.productName))
   }
 }
